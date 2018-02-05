@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require 'nib_integrate_plugin'
+
+desc 'integrate two or more docker-compose applications'
+command :integrate do |c|
+  c.desc 'register an application to integrate'
+  c.command :register do |rc|
+    rc.flag %i[a app], description: 'the app to register', required: true
+    rc.flag [:p, :app_path, 'app-path'],
+            description: 'the application path', required: true
+    rc.flag [:i, :integration_file, 'integration-file'],
+            description: 'the integration docker-compose file', required: false
+    rc.action do |_global_options, options, _args|
+      Nib::Integrate::Registrar.call(options)
+    end
+  end
+
+  c.desc 'bring up one or more applications'
+  c.arg :apps, %i[multiple]
+  c.command :up do |uc|
+    uc.action do |_global_options, _options, args|
+      Nib::Integrate::Integrator.call(args)
+    end
+  end
+
+  c.desc 'list registered applications'
+  c.command :list do |ls|
+    ls.action do |_global_options, _options, _args|
+      Nib::Integrate::Lister.call
+    end
+  end
+end
