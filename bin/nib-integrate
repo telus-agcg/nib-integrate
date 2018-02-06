@@ -3,12 +3,27 @@
 require 'nib_integrate_plugin'
 
 desc 'integrate two or more docker-compose applications'
+# rubocop:disable Metrics/BlockLength
 command :integrate do |c|
+  c.desc 'intialize gem and create config file'
+  c.command :init do |ic|
+    ic.action do |_global_options, _options, _args|
+      Nib::Integrate::ConfigFile
+        .write(Nib::Integrate::ConfigFile::DEFAULT_CONFIG)
+    end
+  end
+
   c.desc 'register an application to integrate'
   c.command :register do |rc|
     rc.flag %i[a app], description: 'the app to register', required: true
     rc.flag [:p, :app_path, 'app-path'],
             description: 'the application path', required: true
+    rc.flag [:s, :service_name, 'service-name'],
+            description: 'the service name to use', required: true
+    rc.flag [:d, :docker_compose_file, 'docker-compose-file'],
+            description: 'docker_compose yml file',
+            required: false,
+            default_value: 'docker-compose.yml'
     rc.flag [:i, :integration_file, 'integration-file'],
             description: 'the integration docker-compose file', required: false
     rc.action do |_global_options, options, _args|
@@ -20,14 +35,25 @@ command :integrate do |c|
   c.arg :apps, %i[multiple]
   c.command :up do |uc|
     uc.action do |_global_options, _options, args|
-      Nib::Integrate::Integrator.call(args)
+      Nib::Integrate::Integrator.up(args).each { |command| system command }
+    end
+  end
+
+  c.desc 'bring down one or more applications'
+  c.arg :apps, %i[multiple]
+  c.command :down do |uc|
+    uc.action do |_global_options, _options, args|
+      Nib::Integrate::Integrator.down(args).each { |command| system command }
     end
   end
 
   c.desc 'list registered applications'
   c.command :list do |ls|
     ls.action do |_global_options, _options, _args|
-      Nib::Integrate::Lister.call
+      Nib::Integrate::Lister.call.each do |name|
+        puts name
+      end
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

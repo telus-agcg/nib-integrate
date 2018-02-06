@@ -5,18 +5,18 @@ module Nib
   module Integrate
     # reads and writes the config file
     class ConfigFile
-      PATH = '~/.nib-integrate-config'.freeze
-      DEFAULT_CONFIG = { apps: [] }.freeze
+      PATH = "#{ENV['HOME']}/.nib-integrate-config".freeze
+      DEFAULT_CONFIG = { 'apps' => [] }.freeze
       class << self
-        def write(config)
+        def write(config, path = PATH)
           # this will write the config file.
-          File.open(PATH, 'w') do |f|
+          File.open(path, 'w') do |f|
             f.write(config.to_yaml)
           end
         end
 
-        def read
-          YAML.load_file(PATH)
+        def read(path = PATH)
+          YAML.load_file(path)
         end
       end
     end
