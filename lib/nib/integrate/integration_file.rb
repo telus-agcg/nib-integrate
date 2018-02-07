@@ -41,11 +41,9 @@ module Nib
 
       def config
         app_services.each_with_object(network_config) do |elem, acc|
-          acc['services'] = {
-            elem => {
-              'external_links' =>  external_links,
-              'networks' => %w[default nib]
-            }
+          acc['services'][elem] = {
+            'external_links' =>  external_links,
+            'networks' => %w[default nib]
           }
         end
       end
