@@ -26,8 +26,6 @@ command :integrate do |c|
             description: 'docker_compose yml file',
             required: false,
             default_value: 'docker-compose.yml'
-    rc.flag [:i, :integration_file, 'integration-file'],
-            description: 'the integration docker-compose file', required: false
     rc.action do |_global_options, options, _args|
       Nib::Integrate::Registrar.call(options)
     end

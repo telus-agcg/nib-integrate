@@ -25,55 +25,7 @@ Or install it yourself as:
 
 You must have `nib` version `>= 2` in order for this plugin to work.
 
-Your applications must also have docker-compose configuration that allows
-the containers to exist on the same network as containers in other projects.
 
-This is accomplished by using the `docker network` settings available in
-docker-compose.
-
-Here is a sample configuration for external networking for a docker-compose
-service. Let's assume that the web service has been defined in the
-`docker-compose.yml` file.
-
-```
-# app1/docker-compose-integration.yml
-
-services:
-  web:
-    external_links:
-      - myexternalservice_web_1:ex-1
-    networks:
-      - default
-      - outside
-networks:
-  outside:
-    external:
-      name: inter-service-network
-```
-
-In this example, the "inter-service-network" will have been created by this command:
-
-```
-docker network create inter-service-network
-```
-
-In the external service docker-compose.yml file, the following configuration
-would exist:
-
-```
-# external_service/docker-compose.yml
-
-
-services:
-  web:
-    networks:
-      - default
-      - outside
-networks:
-  outside:
-    external:
-      name: inter-service-network
-```
 
 ## Usage
 
@@ -89,7 +41,7 @@ The init step must be done before any of the other commands will work.
 To register app1 from above for use with `nib-integrate`:
 
 ```
-nib integrate register -a app1 -p /path/to/src/app1 -s web -i docker-compose-integration.yml
+nib integrate register -a app1 -p /path/to/src/app1 -s web
 ```
 
 To register external_service from above for use with `nib-integrate`:
@@ -119,6 +71,31 @@ To list registered services:
 ```
 nib integrate list
 ```
+
+## Under The Hood
+
+When the up command is run, a dynamically generated integration file is
+generated. This file puts the service container in the default network
+and the nib-integrate-network. and provides an external link to all other
+registered services. This file is then passed as an additional configuration
+file to the docker-compose command that is generated when `up` is called.
+
+```
+# app1/docker-compose-integration.yml
+
+services:
+  web:
+    external_links:
+      - myexternalservice_web_1:myexternalservice_web
+    networks:
+      - default
+      - outside
+networks:
+  outside:
+    external:
+      name: inter-service-network
+```
+
 
 ## Development
 
