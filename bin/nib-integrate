@@ -8,8 +8,10 @@ command :integrate do |c|
   c.desc 'intialize gem and create config file'
   c.command :init do |ic|
     ic.action do |_global_options, _options, _args|
+      next if File.exist?(Nib::Integrate::ConfigFile::PATH)
       Nib::Integrate::ConfigFile
         .write(Nib::Integrate::ConfigFile::DEFAULT_CONFIG)
+      Nib::Integrate::NetworkCreator.call
     end
   end
 
@@ -24,8 +26,6 @@ command :integrate do |c|
             description: 'docker_compose yml file',
             required: false,
             default_value: 'docker-compose.yml'
-    rc.flag [:i, :integration_file, 'integration-file'],
-            description: 'the integration docker-compose file', required: false
     rc.action do |_global_options, options, _args|
       Nib::Integrate::Registrar.call(options)
     end
