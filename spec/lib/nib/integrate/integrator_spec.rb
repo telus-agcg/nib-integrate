@@ -24,12 +24,14 @@ RSpec.describe Nib::Integrate::Integrator do
     }
   end
   let(:config_file) { double(:config_file) }
+  # rubocop:disable Metrics/LineLength
   let(:command_strings) do
     [
-      'cd /foo/path && docker-compose -f docker-compose.yml up -d web',
-      'cd /bar/path && docker-compose -f d-c-web.yml -f int.yml up -d worker'
+      'cd /foo/path && docker-compose -f docker-compose.yml -f foo.yml up -d web',
+      'cd /bar/path && docker-compose -f d-c-web.yml -f foo.yml up -d worker'
     ]
   end
+  # rubocop:enable Metrics/LineLength
 
   let(:down_command_strings) do
     [
@@ -42,6 +44,8 @@ RSpec.describe Nib::Integrate::Integrator do
     allow_any_instance_of(subject)
       .to receive(:config_file).and_return(config_file)
     allow(config_file).to receive(:read).and_return(config)
+    allow_any_instance_of(subject)
+      .to receive(:integration_file_path).and_return('foo.yml')
   end
 
   it 'has an up method' do

@@ -8,8 +8,10 @@ command :integrate do |c|
   c.desc 'intialize gem and create config file'
   c.command :init do |ic|
     ic.action do |_global_options, _options, _args|
+      next if File.exist?(Nib::Integrate::ConfigFile::PATH)
       Nib::Integrate::ConfigFile
         .write(Nib::Integrate::ConfigFile::DEFAULT_CONFIG)
+      Nib::Integrate::NetworkCreator.call
     end
   end
 

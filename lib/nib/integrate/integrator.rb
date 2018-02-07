@@ -71,12 +71,19 @@ module Nib
       end
 
       def integration_file_flag
-        return unless app['integration_file'] && !app['integration_file'].empty?
-        "-f #{app['integration_file']}"
+        "-f #{integration_file_path}"
+      end
+
+      def integration_file_path
+        integration_file.write(app['name'])
       end
 
       def config_file
         ConfigFile
+      end
+
+      def integration_file
+        IntegrationFile
       end
     end
   end
