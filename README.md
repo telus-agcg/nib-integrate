@@ -93,7 +93,7 @@ services:
 networks:
   outside:
     external:
-      name: inter-service-network
+      name: nib-integrate-network
 ```
 
 
