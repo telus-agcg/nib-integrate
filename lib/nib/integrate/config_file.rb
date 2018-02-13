@@ -6,7 +6,7 @@ module Nib
     # reads and writes the config file
     class ConfigFile
       PATH = "#{ENV['HOME']}/.nib-integrate-config".freeze
-      DEFAULT_CONFIG = { 'apps' => [] }.freeze
+      DEFAULT_CONFIG = { 'apps' => [], 'initial_port' => 10_000 }.freeze
       class << self
         def write(config, path = PATH)
           # this will write the config file.

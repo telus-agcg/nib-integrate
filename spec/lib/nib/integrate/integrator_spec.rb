@@ -6,6 +6,7 @@ RSpec.describe Nib::Integrate::Integrator do
   let(:app_args) { %w[foo bar] }
   let(:config) do
     {
+      'initial_port' => 10_000,
       'apps' => [
         {
           'name' => 'foo',
@@ -24,11 +25,13 @@ RSpec.describe Nib::Integrate::Integrator do
     }
   end
   let(:config_file) { double(:config_file) }
+  let(:integration_file) { double(:integration_file) }
+
   # rubocop:disable Metrics/LineLength
   let(:command_strings) do
     [
-      'cd /foo/path && docker-compose -f docker-compose.yml -f foo.yml up -d web',
-      'cd /bar/path && docker-compose -f d-c-web.yml -f foo.yml up -d worker'
+      'cd /foo/path && docker-compose -f .nib-integrate-empty-config-file -f foo.yml up -d web && rm .nib-integrate*',
+      'cd /bar/path && docker-compose -f .nib-integrate-empty-config-file -f foo.yml up -d worker && rm .nib-integrate*'
     ]
   end
   # rubocop:enable Metrics/LineLength
@@ -46,6 +49,12 @@ RSpec.describe Nib::Integrate::Integrator do
     allow(config_file).to receive(:read).and_return(config)
     allow_any_instance_of(subject)
       .to receive(:integration_file_path).and_return('foo.yml')
+    allow_any_instance_of(subject)
+      .to receive(:integration_file).and_return(integration_file)
+    allow(integration_file)
+      .to receive(:write).and_return('foo.yml')
+    allow(integration_file)
+      .to receive(:write_empty_config).and_return('empty_foo.yml')
   end
 
   it 'has an up method' do

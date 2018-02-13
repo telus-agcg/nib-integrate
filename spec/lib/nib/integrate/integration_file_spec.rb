@@ -5,21 +5,19 @@ RSpec.describe Nib::Integrate::IntegrationFile do
   subject { described_class }
   let(:instance) { subject.new(app_name) }
   let(:app_name) { 'foo' }
-  let(:app_path) do
-    "#{ENV['HOME']}/.nib-integrate-network-config-#{app_name}"
-  end
+  let(:app_path) { 'spec/support/foo_app/.nib-integrate-network-config' }
   let(:config) do
     {
       'apps' => [
         {
           'name' => 'foo',
-          'path' => '/path/to/foo_app',
+          'path' => 'spec/support/foo_app',
           'service' => 'web',
           'compose_file' => 'docker-compose.yml'
         },
         {
           'name' => 'bar',
-          'path' => '/path/to/bar_app',
+          'path' => 'spec/support/bar_app',
           'service' => 'api',
           'compose_file' => 'docker-compose.yml'
         }
@@ -28,9 +26,11 @@ RSpec.describe Nib::Integrate::IntegrationFile do
   end
   let(:app_config) do
     {
+      'version' => '2',
       'services' => {
         'web' => {
-          'volumes' => []
+          'volumes' => [],
+          'ports' => ['3000:3000']
         }
       }
     }
@@ -40,6 +40,8 @@ RSpec.describe Nib::Integrate::IntegrationFile do
       'version' => '2',
       'services' => {
         'web' => {
+          'volumes' => [],
+          'ports' => ['10000:3000'],
           'external_links' => ['barapp_api_1:barapp_api'],
           'networks' => %w[default nib]
         }

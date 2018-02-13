@@ -8,3 +8,4 @@
 /spec/examples.txt
 /tmp/
 nib-integrate*.gem
+.nib*

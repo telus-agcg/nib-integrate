@@ -1,16 +1,23 @@
+# frozen_string_literal: true
+
 module Nib
   module Integrate
     # dynamically generated network config file
     class IntegrationFile
       class << self
-        def write(app_name)
-          new(app_name).write
+        def write(app_name, port = 10_000)
+          new(app_name, port).write
+        end
+
+        def write_empty_config(app_name, port = 10_000)
+          new(app_name, port).write_empty_config
         end
       end
 
-      attr_reader :app_name
+      attr_reader :app_name, :current_port
 
-      def initialize(app_name)
+      def initialize(app_name, port = 10_000)
+        @current_port = port
         @app_name = app_name
       end
 
@@ -19,6 +26,12 @@ module Nib
           f.write(config.to_yaml)
         end
         path
+      end
+
+      def write_empty_config
+        File.open(empty_path, 'w') do |f|
+          f.write(empty_config.to_yaml)
+        end
       end
 
       private
@@ -36,15 +49,39 @@ module Nib
       end
 
       def path
-        "#{ENV['HOME']}/.nib-integrate-network-config-#{app['name']}"
+        "#{app['path']}/.nib-integrate-network-config"
+      end
+
+      def empty_path
+        "#{app['path']}/.nib-integrate-empty-config-file"
       end
 
       def config
-        app_services.each_with_object(network_config) do |elem, acc|
-          acc['services'][elem] = {
+        app_services.each_with_object(merged_config) do |elem, acc|
+          service_definition = {
             'external_links' =>  external_links,
             'networks' => %w[default nib]
           }
+          service_definition['ports'] = ports(elem) if ports(elem)
+
+          acc['services'][elem].merge!(service_definition)
+        end
+      end
+
+      def empty_config
+        { 'version' => app_compose_contents['version'] }
+      end
+
+      def merged_config
+        app_compose_contents.merge(network_config)
+      end
+
+      def ports(service_definition)
+        ports = app_docker_compose['services'][service_definition]['ports']
+        return unless ports && !ports.empty?
+        ports.map do |port|
+          existing_ports = port.split(':')
+          [current_port, existing_ports[1]].join(':')
         end
       end
 
@@ -66,8 +103,6 @@ module Nib
 
       def network_config
         {
-          'version' => '2',
-          'services' => {},
           'networks' => {
             'nib' => { 'external' => { 'name' => 'nib-integrate-network' } }
           }
