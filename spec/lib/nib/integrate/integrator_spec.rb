@@ -43,16 +43,20 @@ RSpec.describe Nib::Integrate::Integrator do
     ]
   end
 
+  let(:integration_file_result) do
+    OpenStruct.new(path: 'foo.yml', config: {}, port: 10_001)
+  end
+
   before do
     allow_any_instance_of(subject)
       .to receive(:config_file).and_return(config_file)
     allow(config_file).to receive(:read).and_return(config)
-    allow_any_instance_of(subject)
-      .to receive(:integration_file_path).and_return('foo.yml')
+    # allow_any_instance_of(subject)
+    #   .to receive(:integration_file_path).and_return('foo.yml')
     allow_any_instance_of(subject)
       .to receive(:integration_file).and_return(integration_file)
     allow(integration_file)
-      .to receive(:write).and_return('foo.yml')
+      .to receive(:write).and_return(integration_file_result)
     allow(integration_file)
       .to receive(:write_empty_config).and_return('empty_foo.yml')
   end

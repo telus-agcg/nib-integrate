@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    nib-integrate (0.1.0)
+    nib-integrate (0.2.0)
       nib (~> 2)
 
 GEM

@@ -23,7 +23,7 @@ module Nib
       def up
         args.map do |arg|
           @current_arg = arg
-          @current_port += 1
+          @current_port = current_integration_object.port + 1
           command
         end
       end
@@ -86,10 +86,10 @@ module Nib
       end
 
       def integration_file_flag
-        "-f #{integration_file_path}"
+        "-f #{current_integration_object.path}"
       end
 
-      def integration_file_path
+      def current_integration_object
         integration_file.write(app['name'], current_port)
       end
 

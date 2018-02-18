@@ -1,5 +1,7 @@
+require 'ostruct'
 require 'nib/integrate/config_file'
 require 'nib/integrate/integration_file'
+require 'nib/integrate/integration_file_config'
 require 'nib/integrate/integrator'
 require 'nib/integrate/network_creator'
 require 'nib/integrate/lister'
