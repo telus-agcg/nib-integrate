@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe Nib::Integrate::ConfigFile do
-  let(:default_config) { { 'apps' => [] } }
+  let(:default_config) { { 'apps' => [], 'initial_port' => 10_000 } }
   let(:empty_config) { { 'apps' => [] } }
   let(:test_path) { '.nib-integrate-config-test-path' }
   let(:default_path) { "#{ENV['HOME']}/.nib-integrate-config" }
@@ -10,7 +10,7 @@ RSpec.describe Nib::Integrate::ConfigFile do
   end
 
   it 'has a default empty configuration' do
-    expect(Nib::Integrate::ConfigFile::DEFAULT_CONFIG).to eq('apps' => [])
+    expect(Nib::Integrate::ConfigFile::DEFAULT_CONFIG).to eq(default_config)
   end
 
   it 'is able to write a configuration to the file' do
