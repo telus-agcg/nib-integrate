@@ -1,0 +1,209 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/moon.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+          <h3>Docker Networking Overview</h3>
+          <h5>and introduction to nib-integrate</h5>
+        </section>
+				<section>
+          <h3>What is a docker network?</h3>
+          <div class="fragment">A docker network is a virtual network that allows communication between containers</div>
+        </section>
+        <section>
+          <h3>How do I interact docker networks?</h3> 
+        </section>
+        <section>
+          <h3><code>docker network</code></h3>
+        </section>
+				<section>
+          <h3>What can I do with it?</h3>
+          <section><code>ls</code><br/>to get a list of your networks</section>
+          <section><code>inspect [name or id]</code><br/>to get a json view of a network</section>
+          <section><code>create [name]</code><br/>to make one</section>
+          <section><code>rm [name or id]</code><br/>to get rid of one</section>
+          <section><code>connect [network-id container-id]</code><br/>to connect a running container to a network</section>
+          <section><code>disconnect [network-id container-id]</code><br/>to disconnect a running container from a network</section>
+        </section>
+        <section>
+          <h3>networks in docker compose</h3>
+        </section>
+        <section data-transition="slide-in none-out">
+          <h2>version 2</h2>
+          &nbsp;
+          <pre>
+          version: "2"
+          services:
+            web:
+              networks:
+                - default
+                - outside
+              ports:
+                - 3000:3000
+              external_links:
+                - other_service_1:other_service
+          networks:
+            outside:
+              external:
+                name: external-network
+          </pre>
+        </section>
+        <section data-transition="none-in none-out">
+          <h2>version 2</h2>
+          define an external network
+          <pre>
+          version: "2"
+          services:
+            web:
+              networks:
+                - default
+                - outside
+              ports:
+                - 3000:3000
+              external_links:
+                - other_service_1:other_service
+          <mark>networks:
+            outside:
+              external:
+                name: external-network</mark>
+          </pre>
+        </section>
+        <section data-transition="none-in none-out">
+          <h2>version 2</h2>
+          use a network
+          <pre>
+          version: "2"
+          services:
+            web:
+              <mark>networks:
+                - default
+                - outside</mark>
+              ports:
+                - 3000:3000
+              external_links:
+                - other_service_1:other_service
+          networks:
+            outside:
+              external:
+                name: external-network
+          </pre>
+        </section>
+        <section data-transition="none-in slide-out">
+          <h2>version 2</h2>
+          link to a container in another network
+          <pre>
+          version: "2"
+          services:
+            web:
+              networks:
+                - default
+                - outside
+              ports:
+                - 3000:3000
+              <mark>external_links:
+                - other_service_1:other_service</mark>
+          networks:
+            outside:
+              external:
+                name: external-network
+          </pre>
+        </section>
+        <section>
+          <h2>But I've never used that...</h2>
+          a docker compose file with no network nodes puts all containers in a default network. That's essentially the same as...
+          <pre>
+          version: 2
+          services:
+            web:
+              networks:
+                - default
+          </pre>
+        </section>
+        <section>
+          <h3>A note about ports</h3>
+          As far as I know, the only network that cares about the <code>ports:</code> node in a service definition is the host network.
+        </section>
+				<section>
+          <h3>Why should I care?</h3> 
+          <div class="fragment">Usually, you don't</div>
+        </section>
+        <section>
+          <h3>When should I care?</h3>
+          <div class="fragment">You should care about networking when you want one docker-compose application to be able to talk to another</div>
+        </section>
+        <section>
+          <h3>Why is this a problem?</h3>
+          <div class="fragment">All of our projects use docker networking through <code>docker-compose</code></div>
+          <div class="fragment">All of our projects are isolated by their network (the default)</div>
+          <div class="fragment">So none of them can talk together</div>
+        </section>
+        <section>
+          <h3>Again - why is this a problem?</h3>
+          <div class="fragment">We are writing more and more services.</div>
+          <div class="fragment">Each service is in its own docker-compose network</div>
+          <div class="fragment">We will need to invoke multiple services to achieve business goals</div>
+          <div class="fragment">Without thinking about docker networking - we can't</div>
+        </section>
+        <section>
+          <h3>Enter</h3>
+          <h3><code>nib integrate</code></h3>
+          <div class="fragment"><code>nib integrate</code> is designed so you don't have to think about docker networking </div>
+          <div class="fragment">(well maybe a little)</div>
+        </section>
+        <section>
+          <h3>What can I do with it?</h3>
+          <section><code>nib integrate init</code><br/>to start using the gem</section>
+          <section><code>nib integrate register -a my_app -p /path/to/app -s web</code><br/>to register an application with the gem</section>
+          <section><code>nib integrate list</code><br/>to list your integrated apps</section>
+          <section><code>nib integrate up</code><br/>to up one or more apps<br/>(all applications are brought up in the background)</section>
+          <section><code>nib integrate down</code><br/>to bring down one or more apps</section>
+        </section>
+        <section>
+          <h1>Questions</h1>
+        </section>
+        <section>
+          <h1>Thank You!</h1>
+        </section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
