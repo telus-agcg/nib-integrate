@@ -1,0 +1,20 @@
+name: Master Workflow
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Deploy Gem
+    uses: telus-agcg/ci-pipeline-templates/.github/workflows/docker-deploy-gem-template.yml@version/1.3
+    with:
+      gemDirectory: "./"
+      gemService: "ci"
+      sourceOwner: "telus-agcg"
+      dryRun: false
+    secrets:
+      buildArgs: ${{ secrets.BUILD_ARGS }}
+      githubToken: ${{ secrets.GITHUB_TOKEN }}
+      encryptionKey: ${{ secrets.ENCRYPTION_KEY }}

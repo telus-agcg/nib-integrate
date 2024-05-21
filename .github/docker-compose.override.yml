@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  <<: *default-services
+  test:
+    <<: *base
+    entrypoint: .github/test
+  lint:
+    <<: *base
+    entrypoint: .github/lint
