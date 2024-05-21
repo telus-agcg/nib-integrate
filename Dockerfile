@@ -1,4 +1,6 @@
-FROM ruby:2.5
+FROM ruby:3.3.1
+
+RUN gem update --system 3.5.10
 
 WORKDIR /usr/src/app
 

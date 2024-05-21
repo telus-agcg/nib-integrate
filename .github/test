@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo "Running Setup..."
+./bin/setup
+
+echo "Running Tests..."
+rspec
